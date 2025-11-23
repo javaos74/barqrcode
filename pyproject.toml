@@ -1,0 +1,12 @@
+[project]
+name = "BarQRCodeExtractor"
+version = "0.1.0"
+authors = [{ name = "Charles Kim", email = "hyungsoo.kim@uipath.com" }]
+description = "Extract QRCode and Barcode from image file in storage bucket"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pyzbar==0.1.9",
+    "image==1.5.33",
+    "uipath==2.1.183"
+]
