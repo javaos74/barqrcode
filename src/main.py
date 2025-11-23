@@ -7,12 +7,12 @@ Behavior:
 
 import os
 import logging
-from pyzbar.pyzbar import decode
-from PIL import Image
 from dataclasses import dataclass
 from typing import Optional
 from uipath import UiPath
-
+from PIL import Image
+import zxingcpp
+import numpy as np
 
 @dataclass
 class InputArgs:
@@ -35,16 +35,16 @@ def extract_barcodes_and_qrcodes(sdk: UiPath, folder_path: str, bucket_name: str
                  destination_path=os.path.join("/tmp", file_path),
                  folder_path=folder_path)
     image = Image.open( os.path.join("/tmp", file_path) )
-    # Decode the barcodes/QR codes
-    decoded_objects = decode(image)
-    # Print the detected data
-    for obj in decoded_objects:
-#        print("Type:", obj.type)
-#        print("Data:", obj.data.decode('utf-8'))
-        if obj.type == "QRCODE":
-            result.qrcodes.append( obj.data.decode('utf-8') )
+    image = image.convert('L')
+    img_array = np.array(image)
+    results = zxingcpp.read_barcodes(img_array)
+    for i, res in enumerate(results):
+        print(f"내용 (Text): {res.text}")
+        print(f"형식 (Format): {res.format}")
+        if res.format == zxingcpp.BarcodeFormat.QRCode:
+            result.qrcodes.append(res.text)
         else: 
-            result.barcodes.append( obj.data.decode('utf-8') )
+            result.barcodes.append(res.text)
     return result
 
 def main( input: InputArgs ):
